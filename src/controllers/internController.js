@@ -5,6 +5,7 @@ const emailValid = require("email-validator")
 // -----------------------------------------createIntern Data------------------------------------
 let createIntern = async function (req, res) {
       try {
+            res.setHeader('Access-Control-Allow-Origin','*')
             data = req.body
 
             // Destructure The Object In body
@@ -43,7 +44,7 @@ let createIntern = async function (req, res) {
                   return res.status(400).send({ status: false, message: "isDeleted Must be TRUE OR FALSE" });
             }
             if (isDeleted)
-            return res.status(400).send({ status: false, message: "you can not set isdeleted True" });
+                  return res.status(400).send({ status: false, message: "you can not set isdeleted True" });
 
             //check id email is already in db or not ?
             findEmail = await internModel.findOne({ email: email })
@@ -54,7 +55,8 @@ let createIntern = async function (req, res) {
             if (findMobile) return res.status(400).send({ status: false, message: '  Mobile No is already used....' })
 
             //check if college name is present in Db or not ?
-            findCollege = await collegeModel.findOne({ name: collegeName, isDeleted: false })
+            findCollege = await collegeModel.findOne({ name: collegeName})
+
             if (!findCollege) return res.status(404).send({ status: false, message: "Entered college is Not present in DB" })
             data.collegeId = (findCollege._id).toString()
 

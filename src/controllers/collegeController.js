@@ -4,8 +4,8 @@ const internModel = require('../models/internModel')
 
 // ----------------------------Create New College-----------------------------------------
 let createCollage = async function (req, res) {
-      try {
-            const data = req.body; 
+      try { res.setHeader('Access-Control-Allow-Origin','*')
+            const data = req.body;
 
             // destructure college data
             let { name, fullName, logoLink, isDeleted, ...rest } = data
@@ -17,8 +17,8 @@ let createCollage = async function (req, res) {
 
             //validate the college name
             if (!name) return res.status(400).send({ status: false, message: "Name is Missing" })
-             //Check if college full name present or not?
-             if (!fullName) return res.status(400).send({ status: false, message: "Fullname is Missing" })
+            //Check if college full name present or not?
+            if (!fullName) return res.status(400).send({ status: false, message: "Fullname is Missing" })
 
             //Check if Name Is Vilid or Not?
             var regEx = /^[a-zA-Z\-]+$/;
@@ -26,7 +26,6 @@ let createCollage = async function (req, res) {
                   return res.status(400).send({ status: false, message: "Name is invalid" });
             }
 
-           
 
             //Check if fullName Is Vilid or Not?
             var regEex = /[a-z]+/;
@@ -47,7 +46,7 @@ let createCollage = async function (req, res) {
                   return res.status(400).send({ status: false, message: "isDeleted Must be TRUE OR FALSE" });
             }
             if (isDeleted)
-            return res.status(400).send({ status: false, message: "you can not set isdeleted True" });
+                  return res.status(400).send({ status: false, message: "you can not set isdeleted True" });
 
             //if college name is already present In DB or Not!
             const findName = await collageModel.findOne({ name: name })
@@ -64,13 +63,12 @@ let createCollage = async function (req, res) {
 
 // -----------------------------------get Collage Details---------------------
 let getcollegeDetails = async function (req, res) {
-      try {
+      try { res.setHeader('Access-Control-Allow-Origin','*')
             data = req.query
 
             // Destructure object data
             let { collegeName } = data
-            if (!collegeName)
-                  return res.status(400).send({ status: false, message: "Missing college name in quary param" });
+            if (!collegeName) return res.status(400).send({ status: false, message: "Missing college name in quary param" });
 
             // if collegeName Is Present
             let collegeData = await collageModel.findOne({ name: collegeName, isDeleted: false }).lean()
@@ -83,11 +81,11 @@ let getcollegeDetails = async function (req, res) {
             let internData = await internModel.find({ collegeId: collegedId, isDeleted: false }).select("name email mobile")
             if (internData.length == 0) return res.status(404).send({ status: false, message: "No intern Found" });
 
-            collegeData.interns=internData
-           
+            collegeData.interns = internData
+
             //  response all collage data
             return res.status(200).send({ status: true, data: collegeData });
-            
+
       }
       catch (err) {
             return res.status(500).send({ status: false, message: "Error", error: err.message })
