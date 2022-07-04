@@ -1,12 +1,11 @@
-const { rest } = require("lodash");
-const { object } = require("webidl-conversions");
+
 const collageModel = require("../models/collegeModel")
 const internModel = require('../models/internModel')
 
 // ----------------------------Create New College-----------------------------------------
 let createCollage = async function (req, res) {
       try {
-            const data = req.body;
+            const data = req.body; 
 
             // destructure college data
             let { name, fullName, logoLink, isDeleted, ...rest } = data
@@ -18,6 +17,8 @@ let createCollage = async function (req, res) {
 
             //validate the college name
             if (!name) return res.status(400).send({ status: false, message: "Name is Missing" })
+             //Check if college full name present or not?
+             if (!fullName) return res.status(400).send({ status: false, message: "Fullname is Missing" })
 
             //Check if Name Is Vilid or Not?
             var regEx = /^[a-zA-Z\-]+$/;
@@ -25,8 +26,7 @@ let createCollage = async function (req, res) {
                   return res.status(400).send({ status: false, message: "Name is invalid" });
             }
 
-            //Check if college full name present or not?
-            if (!fullName) return res.status(400).send({ status: false, message: "Fullname is Missing" })
+           
 
             //Check if fullName Is Vilid or Not?
             var regEex = /[a-z]+/;
@@ -73,7 +73,7 @@ let getcollegeDetails = async function (req, res) {
                   return res.status(400).send({ status: false, message: "Missing college name in quary param" });
 
             // if collegeName Is Present
-            let collegeData = await collageModel.findOne({ name: collegeName, isDeleted: false })
+            let collegeData = await collageModel.findOne({ name: collegeName, isDeleted: false }).lean()
             if (!collegeData) return res.status(404).send({ status: false, message: "College Not Found" });
 
             // is there store college Id
@@ -83,8 +83,10 @@ let getcollegeDetails = async function (req, res) {
             let internData = await internModel.find({ collegeId: collegedId, isDeleted: false }).select("name email mobile")
             if (internData.length == 0) return res.status(404).send({ status: false, message: "No intern Found" });
 
+            collegeData.interns=internData
+           
             //  response all collage data
-            return res.status(200).send({ status: true, data: { "name": collegeData.name, "fullName": collegeData.fullName, "logoLink": collegeData.logoLink, "interns": internData } });
+            return res.status(200).send({ status: true, data: collegeData });
             
       }
       catch (err) {
