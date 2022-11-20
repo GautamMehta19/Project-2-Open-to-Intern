@@ -4,7 +4,8 @@ const internModel = require('../models/internModel')
 
 // ----------------------------Create New College-----------------------------------------
 let createCollage = async function (req, res) {
-      try { res.setHeader('Access-Control-Allow-Origin','*')
+      try {
+            res.setHeader('Access-Control-Allow-Origin', '*')
             const data = req.body;
 
             // destructure college data
@@ -63,32 +64,54 @@ let createCollage = async function (req, res) {
 
 // -----------------------------------get Collage Details---------------------
 let getcollegeDetails = async function (req, res) {
-      try { res.setHeader('Access-Control-Allow-Origin','*')
+      try {
+            res.setHeader('Access-Control-Allow-Origin', '*')
             data = req.query
 
             // Destructure object data
             let { collegeName } = data
-            if (!collegeName) return res.status(400).send({ status: false, message: "Missing college name in quary param" });
 
+            if (!collegeName) {
+                  return res.status(400).send({
+                        status: false,
+                        message: "Missing college name in quary param"
+                  });
+            }
             // if collegeName Is Present
             let collegeData = await collageModel.findOne({ name: collegeName, isDeleted: false }).lean()
-            if (!collegeData) return res.status(404).send({ status: false, message: "College Not Found" });
 
+            if (!collegeData) {
+                  return res.status(404).send({
+                        status: false,
+                        message: "College Not Found"
+                  });
+            }
             // is there store college Id
             collegedId = (collegeData._id).toString()
 
             // get All Intern detail(name,email,mobile)
             let internData = await internModel.find({ collegeId: collegedId, isDeleted: false }).select("name email mobile")
-            if (internData.length == 0) return res.status(404).send({ status: false, message: "No intern Found" });
 
+            if (internData.length == 0) {
+                  return res.status(404).send({
+                        status: false,
+                        message: "No intern Found"
+                  });
+            }
             collegeData.interns = internData
 
             //  response all collage data
-            return res.status(200).send({ status: true, data: collegeData });
+            return res.status(200).send({ 
+                  status: true, 
+                  data: collegeData 
+            });
 
       }
       catch (err) {
-            return res.status(500).send({ status: false, message: "Error", error: err.message })
+            return res.status(500).send({
+                  status: false,
+                  message: "Error", error: err.message
+            })
       }
 }
 
